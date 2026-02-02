@@ -1,0 +1,53 @@
+# Configuración Spring Boot - Archivo Base
+spring:
+  application:
+    name: base-api2
+  
+  # Profile activo por defecto
+  profiles:
+    active: local
+  
+  # Configuración de DataSource (valores por defecto, sobreescritos por profiles)
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  
+  # Configuración de Flyway
+  flyway:
+    enabled: true
+    schemas: app
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  # Configuración de JPA
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+# Configuración del servidor
+server:
+  port: 8080
+  servlet:
+    context-path: /base-api2
+
+# Configuración de OpenAPI / Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+  show-actuator: false
+
+# Configuración de logging (valores por defecto)
+logging:
+  level:
+    root: INFO
+    com.ar.laboratory.baseapi2: INFO
