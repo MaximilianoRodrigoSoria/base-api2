@@ -1,19 +1,45 @@
 # 🚀 Base API 2
 
-API REST base con Spring Boot 4.0.2 (Java 17), arquitectura hexagonal, Redis cache y Docker optimizado.
+API REST base con Spring Boot 4.0.2 (Java 17), arquitectura hexagonal, Redis cache, logging avanzado y herramientas de calidad de código.
 
 ## ✨ Características
 
+### Arquitectura y Desarrollo
 - ✅ **Arquitectura Hexagonal** (Ports & Adapters)
 - ✅ **Spring Boot 4.0.2** con Java 17
+- ✅ **Lombok** para reducir boilerplate
+
+### Base de Datos y Persistencia
 - ✅ **PostgreSQL 15** como base de datos principal
-- ✅ **Redis 7** para caché distribuido
+- ✅ **Redis 7** para caché distribuido con TTL configurable
 - ✅ **H2** para tests (base de datos en memoria)
+- ✅ **Flyway** para migraciones versionadas
+
+### Seguridad y Logging
+- ✅ **Sistema de Logging Avanzado** con sanitización automática
+  - Filtro HTTP que captura requests/responses
+  - Enmascaramiento de datos sensibles (passwords, tokens, DNIs, CUIT, tarjetas)
+  - Truncamiento de bodies grandes
+  - Exclusión de endpoints de monitoreo
+- ✅ **LogSanitizer** para protección de información sensible en logs
+
+### Calidad de Código
+- ✅ **Spotless** con formato automático (Google Java Format AOSP)
+- ✅ **Checkstyle** para validación de convenciones de nombrado
+- ✅ **PMD** para detección de code smells
+- ✅ **SpotBugs** para análisis estático de bugs
+- ✅ **4 herramientas de calidad** integradas en el build
+
+### Testing
+- ✅ **JUnit 5 + Mockito** para tests unitarios
+- ✅ **Testcontainers** para tests de integración con PostgreSQL real
+- ✅ **WireMock** para mocking de APIs HTTP
+- ✅ **WebTestClient** para testing de APIs REST
+
+### DevOps
 - ✅ **Docker Multi-stage Build** (imagen optimizada ~200MB)
-- ✅ **Flyway** para migraciones de BD
-- ✅ **OpenAPI/Swagger** para documentación
-- ✅ **Spotless** con formato automático de código
-- ✅ **Tests unitarios** completos con JUnit 5 + Mockito
+- ✅ **Docker Compose** con healthchecks
+- ✅ **OpenAPI/Swagger** para documentación interactiva
 
 ## 🏗️ Arquitectura
 
@@ -34,7 +60,10 @@ src/main/java/com/ar/laboratory/baseapi2/
     ├── adapter/
     │   ├── in/web/         # Controllers REST
     │   └── out/persistence/ # Implementación JPA
-    └── config/             # Configuración (Cache, Swagger, etc)
+    ├── config/             # Configuración (Cache, Swagger, etc)
+    └── logging/            # Sistema de logging y sanitización
+        ├── LoggingFilter   # Filtro HTTP para captura de requests
+        └── LogSanitizer    # Sanitización de datos sensibles
 ```
 
 ## 🚀 Tecnologías
@@ -46,19 +75,28 @@ src/main/java/com/ar/laboratory/baseapi2/
   - Spring Data Redis
   - Spring Cache
   - Spring Validation
+  - Spring WebFlux (testing)
 - **Lombok**
 
 ### Base de Datos
 - **PostgreSQL 15** (producción)
-- **H2** (tests)
-- **Flyway** (migraciones)
+- **H2** (tests unitarios)
+- **Flyway 10.20.1** (migraciones)
 
 ### Caché
 - **Redis 7** (Alpine)
 
 ### Calidad de Código
-- **Spotless** (formato automático)
-- **JUnit 5 + Mockito** (testing)
+- **Spotless 6.25.0** (formato automático - Google Java Format AOSP)
+- **Checkstyle 10.20.2** (naming conventions y estructura)
+- **PMD 7.8.0** (detección de code smells)
+- **SpotBugs 4.8.6** (análisis estático de bugs)
+
+### Testing
+- **JUnit 5** + **Mockito** (tests unitarios)
+- **Testcontainers 1.20.4** (tests de integración)
+- **WireMock 3.9.2** (HTTP mocking)
+- **WebTestClient** (testing de APIs)
 
 ### DevOps
 - **Docker** con multi-stage build
@@ -93,7 +131,7 @@ La aplicación estará disponible en:
 # 1. Levantar infraestructura (PostgreSQL y Redis)
 docker-compose up postgres redis -d
 
-# 2. Compilar
+# 2. Compilar (incluye Spotless automáticamente)
 ./gradlew clean build
 
 # 3. Ejecutar
@@ -112,6 +150,7 @@ El proyecto incluye un **Dockerfile multi-stage optimizado**:
 - 📦 Imagen final ~200MB (70% más liviana)
 - 🔒 Usuario no-root para seguridad
 - ✨ Spotless se ejecuta automáticamente
+- 🔍 Todas las herramientas de calidad validadas en build
 
 Ver documentación completa: [DOCKER.md](DOCKER.md)
 
@@ -125,11 +164,12 @@ Ver documentación completa: [DOCKER.md](DOCKER.md)
 | `SPRING_DATASOURCE_URL` | URL de PostgreSQL | `jdbc:postgresql://localhost:5432/baseapi2` |
 | `SPRING_DATA_REDIS_HOST` | Host de Redis | `localhost` |
 | `SPRING_DATA_REDIS_PORT` | Puerto de Redis | `6379` |
+| `JAVA_OPTS` | Opciones de JVM | `-Xmx512m -Xms256m` |
 
 ### Profiles
 
-- **local**: Desarrollo local (PostgreSQL + Redis)
-- **test**: Tests (H2 + Simple Cache)
+- **local**: Desarrollo local (PostgreSQL + Redis + Logging completo)
+- **test**: Tests (H2 + Simple Cache + Logs mínimos)
 
 ## 🔌 Endpoints
 
@@ -200,7 +240,54 @@ curl http://localhost:8080/base-api2/api/v1/examples/dni/12345678
 - ⚡ Primera consulta: busca en BD y cachea en Redis
 - 🚀 Siguientes consultas: obtiene del caché (más rápido)
 - 🔄 Al crear: invalida caché automáticamente
-- ⏱️ TTL: 10 minutos
+- ⏱️ TTL: 10 minutos (configurable)
+
+## 🔒 Sistema de Logging y Seguridad
+
+### Características del Sistema de Logging
+
+El proyecto incluye un **sistema de logging avanzado** con sanitización automática de datos sensibles:
+
+#### LoggingFilter
+- 🔍 Captura todas las peticiones HTTP (request + response)
+- 📊 Mide duración de cada request
+- 🚫 Excluye endpoints de actuator, swagger y recursos estáticos
+- 📦 Trunca bodies grandes (máx 10KB) para evitar saturar logs
+- 🔒 **Sanitiza datos sensibles antes de loguear**
+
+#### LogSanitizer
+Enmascara automáticamente:
+- 🔑 Passwords, secrets, tokens, API keys
+- 🎫 Headers de autorización (Authorization, X-API-Key, etc.)
+- 🆔 DNI argentino (8 dígitos)
+- 🏢 CUIT/CUIL (11 dígitos)
+- 💳 Tarjetas de crédito (13-19 dígitos)
+
+**Ejemplo de logs:**
+
+```log
+HTTP POST /api/v1/examples | status=201 | duration=145ms | timestamp=2026-02-03T10:00:00Z
+REQUEST: {"name":"John Doe","dni":"****"}
+RESPONSE: {"id":1,"name":"John Doe","dni":"****"}
+```
+
+### Configurar Paths Excluidos
+
+```java
+// LoggingFilter.java
+private static final Set<String> SKIP_PATH_PREFIXES = 
+    Set.of("/actuator", "/swagger-ui", "/v3/api-docs");
+```
+
+### Agregar Nuevas Reglas de Sanitización
+
+```java
+// LogSanitizer.java - Agregar nueva regla en RULES
+new Rule(
+    Pattern.compile("(\"email\"\\s*:\\s*\")([^\"]+)(\")", Pattern.CASE_INSENSITIVE),
+    "$1****$3"
+)
+```
 
 ## 🗄️ Redis Cache
 
@@ -225,14 +312,117 @@ public ExampleResponse create(CreateExampleRequest request) {
 # Ver todas las claves en Redis
 docker exec -it baseapi2-redis redis-cli KEYS "*"
 
+# Ver valor específico
+docker exec -it baseapi2-redis redis-cli GET "examplesByDni::12345678"
+
 # Limpiar caché
 docker exec -it baseapi2-redis redis-cli FLUSHALL
 
 # Monitorear en tiempo real
 docker exec -it baseapi2-redis redis-cli MONITOR
+
+# Ver TTL de una clave
+docker exec -it baseapi2-redis redis-cli TTL "examplesByDni::12345678"
 ```
 
 Ver documentación completa: [REDIS.md](REDIS.md)
+
+## ✨ Calidad de Código
+
+El proyecto integra **4 herramientas de calidad** que se ejecutan automáticamente:
+
+### 1. Spotless - Formato Automático
+
+Formatea el código automáticamente antes de cada compilación:
+
+```bash
+# Aplicar formato manualmente
+./gradlew spotlessApply
+
+# Verificar formato
+./gradlew spotlessCheck
+```
+
+**Configuración:**
+- Google Java Format (AOSP)
+- Indentación: 4 espacios
+- Imports ordenados y sin duplicados
+- Se ejecuta automáticamente antes de `compileJava`
+
+### 2. Checkstyle - Convenciones de Código
+
+Valida naming conventions y estructura del código:
+
+```bash
+# Ejecutar Checkstyle
+./gradlew checkstyleMain checkstyleTest
+
+# Ver reporte HTML
+start build/reports/checkstyle/main.html
+```
+
+**Valida:**
+- ✅ Nombres en PascalCase para clases
+- ✅ Nombres en camelCase para métodos y variables
+- ✅ Constantes en UPPER_SNAKE_CASE
+- ✅ Imports sin wildcards (*)
+- ✅ No usar System.out/err (usar logger)
+- ✅ Javadoc en clases y métodos públicos
+- ✅ Complejidad ciclomática < 15
+- ✅ Máximo 7 parámetros por método
+
+### 3. PMD - Detección de Code Smells
+
+Detecta problemas de diseño y malas prácticas:
+
+```bash
+# Ejecutar PMD
+./gradlew pmdMain pmdTest
+
+# Ver reporte HTML
+start build/reports/pmd/main.html
+```
+
+**Detecta:**
+- 🔍 Código duplicado
+- 🔍 Variables no utilizadas
+- 🔍 Métodos demasiado largos o complejos
+- 🔍 Importaciones innecesarias
+- 🔍 Expresiones demasiado complejas
+
+### 4. SpotBugs - Análisis Estático de Bugs
+
+Encuentra bugs potenciales mediante análisis del bytecode:
+
+```bash
+# Ejecutar SpotBugs
+./gradlew spotbugsMain spotbugsTest
+
+# Ver reporte HTML
+start build/reports/spotbugs/main.html
+```
+
+**Detecta:**
+- 🐛 NullPointerException potenciales
+- 🐛 Resource leaks
+- 🐛 Thread safety issues
+- 🐛 Performance issues
+- 🐛 Security vulnerabilities
+
+### Ejecutar Todas las Herramientas
+
+```bash
+# Build completo con todas las validaciones
+./gradlew clean build
+
+# Solo herramientas de calidad
+./gradlew spotlessCheck checkstyleMain pmdMain spotbugsMain
+
+# Todas las herramientas + tests
+./gradlew check
+```
+
+**Nota:** El build falla si SpotBugs encuentra bugs de alta severidad.
 
 ## 🧪 Testing
 
@@ -247,6 +437,71 @@ Ver documentación completa: [REDIS.md](REDIS.md)
 
 # Tests específicos
 ./gradlew test --tests FindExampleByDniServiceTest
+
+# Tests con logs detallados
+./gradlew test --info
+```
+
+### Tipos de Tests
+
+#### 1. Tests Unitarios (JUnit 5 + Mockito)
+```java
+@ExtendWith(MockitoExtension.class)
+class FindExampleByDniServiceTest {
+    @Mock private ExampleRepositoryPort repository;
+    @InjectMocks private FindExampleByDniService service;
+    
+    @Test
+    void shouldFindExampleByDni() {
+        // Arrange, Act, Assert
+    }
+}
+```
+
+#### 2. Tests de Integración (Testcontainers)
+```java
+@Testcontainers
+@SpringBootTest
+class ExampleRepositoryIntegrationTest {
+    @Container
+    static PostgreSQLContainer<?> postgres = 
+        new PostgreSQLContainer<>("postgres:15-alpine");
+    
+    @Test
+    void shouldPersistExample() {
+        // Test con PostgreSQL real en Docker
+    }
+}
+```
+
+#### 3. Tests de API (WebTestClient)
+```java
+@SpringBootTest(webEnvironment = RANDOM_PORT)
+class ExampleControllerIntegrationTest {
+    @Autowired
+    private WebTestClient webTestClient;
+    
+    @Test
+    void shouldCreateExample() {
+        webTestClient.post().uri("/api/v1/examples")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(request)
+            .exchange()
+            .expectStatus().isCreated();
+    }
+}
+```
+
+#### 4. HTTP Mocking (WireMock)
+```java
+@WireMockTest
+class ExternalApiTest {
+    @Test
+    void shouldMockExternalApi() {
+        stubFor(get("/external-api")
+            .willReturn(ok().withBody("{\"result\":\"success\"}")));
+    }
+}
 ```
 
 ### Configuración de Tests
@@ -260,6 +515,18 @@ spring:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL
   cache:
     type: simple  # Cache simple en lugar de Redis
+  jpa:
+    show-sql: true
+```
+
+### Cobertura de Código
+
+```bash
+# Generar reporte de cobertura
+./gradlew test jacocoTestReport
+
+# Ver reporte
+start build/reports/jacoco/test/html/index.html
 ```
 
 ## 📚 Documentación API (Swagger)
@@ -269,22 +536,11 @@ La API está documentada con **OpenAPI 3.0**:
 - **Swagger UI**: http://localhost:8080/base-api2/swagger-ui.html
 - **JSON Spec**: http://localhost:8080/base-api2/api-docs
 
-## ✨ Spotless - Formato Automático
-
-El código se formatea automáticamente antes de cada compilación:
-
-```bash
-# Aplicar formato manualmente
-./gradlew spotlessApply
-
-# Verificar formato
-./gradlew spotlessCheck
-```
-
-**Configuración:**
-- Google Java Format (AOSP)
-- Indentación: 4 espacios
-- Imports ordenados y sin duplicados
+**Características:**
+- 📖 Documentación interactiva de todos los endpoints
+- 🧪 Probar APIs directamente desde el navegador
+- 📋 Esquemas de Request/Response
+- ⚠️ Códigos de error documentados
 
 ## 🐛 Manejo de Errores
 
@@ -303,16 +559,28 @@ Todas las respuestas de error siguen el mismo formato:
 
 ### Códigos de Error
 
-| Código | Descripción |
-|--------|-------------|
-| 400 | Bad Request - Validación fallida |
-| 404 | Not Found - Recurso no encontrado |
-| 409 | Conflict - DNI duplicado |
-| 500 | Internal Server Error |
+| Código | Descripción | Ejemplo |
+|--------|-------------|---------|
+| 400 | Bad Request | Validación fallida (nombre vacío, DNI inválido) |
+| 404 | Not Found | Recurso no encontrado con el DNI especificado |
+| 409 | Conflict | DNI duplicado al intentar crear |
+| 500 | Internal Server Error | Error inesperado del servidor |
+
+### Excepciones Personalizadas
+
+```java
+// domain/exception/
+- BadRequestException         // 400
+- ExampleNotFoundException    // 404
+- ExampleAlreadyExistsException // 409
+- InfrastructureException     // 500
+```
 
 ## 📦 Base de Datos
 
 ### Migraciones con Flyway
+
+Las migraciones se versionan en `src/main/resources/db/migration/`:
 
 ```sql
 -- V1__create_schema.sql
@@ -331,7 +599,25 @@ INSERT INTO app.examples (name, dni)
 VALUES ('John Doe', '12345678');
 ```
 
+### Comandos Útiles
+
+```bash
+# Conectar a PostgreSQL
+docker exec -it baseapi2-postgres psql -U postgres -d baseapi2
+
+# Ver tablas
+\dt app.*
+
+# Ver datos
+SELECT * FROM app.examples;
+
+# Ver historial de Flyway
+SELECT * FROM app.flyway_schema_history;
+```
+
 ## 🛠️ Comandos Útiles
+
+### Docker Compose
 
 ```bash
 # Ver logs de todos los servicios
@@ -354,47 +640,89 @@ docker-compose build --no-cache
 
 # Ver estado de servicios
 docker-compose ps
+
+# Ver uso de recursos
+docker stats baseapi2-app baseapi2-postgres baseapi2-redis
+```
+
+### Gradle
+
+```bash
+# Limpiar y compilar
+./gradlew clean build
+
+# Solo compilar (sin tests)
+./gradlew build -x test
+
+# Ejecutar la aplicación
+./gradlew bootRun
+
+# Ver dependencias
+./gradlew dependencies
+
+# Ver tareas disponibles
+./gradlew tasks
+
+# Build en modo verbose
+./gradlew build --info
 ```
 
 ## 📊 Arquitectura de Servicios
 
 ```
-┌─────────────────┐
-│   Docker Host   │
-├─────────────────┤
-│                 │
-│  ┌───────────┐  │
-│  │    App    │  │ :8080
-│  │ Spring    │  │
-│  │ Boot      │  │
-│  └─────┬─────┘  │
-│        │        │
-│  ┌─────┴─────┐  │
-│  │           │  │
-│  ▼           ▼  │
-│ ┌──────┐  ┌────┐│
-│ │ Post │  │Redis││ :5432, :6379
-│ │ greSQL  │    ││
-│ └──────┘  └────┘│
-│                 │
-└─────────────────┘
+┌─────────────────────────────────┐
+│       Docker Host               │
+├─────────────────────────────────┤
+│                                 │
+│  ┌───────────────────────────┐  │
+│  │    App (Spring Boot)      │  │ :8080
+│  │  ┌─────────────────────┐  │  │
+│  │  │  LoggingFilter      │  │  │ ◄── Captura requests
+│  │  │  LogSanitizer       │  │  │ ◄── Sanitiza datos
+│  │  └─────────────────────┘  │  │
+│  │  ┌─────────────────────┐  │  │
+│  │  │  Controllers        │  │  │
+│  │  │  Use Cases          │  │  │
+│  │  │  Domain Models      │  │  │
+│  │  └─────────────────────┘  │  │
+│  └───────┬───────────┬───────┘  │
+│          │           │          │
+│          ▼           ▼          │
+│    ┌──────────┐  ┌──────────┐  │
+│    │PostgreSQL│  │  Redis   │  │ :5432, :6379
+│    │   15     │  │    7     │  │
+│    └──────────┘  └──────────┘  │
+│                                 │
+└─────────────────────────────────┘
 ```
 
 ## 🎯 Roadmap
 
+### Completado ✅
 - [x] Arquitectura hexagonal
 - [x] Docker multi-stage build
-- [x] Redis cache
+- [x] Redis cache con TTL
 - [x] H2 para tests
 - [x] OpenAPI/Swagger
 - [x] Spotless automático
 - [x] Endpoint búsqueda por DNI
+- [x] Sistema de logging con sanitización
+- [x] Checkstyle, PMD, SpotBugs
+- [x] Testcontainers
+- [x] WireMock para HTTP mocking
+- [x] Tests unitarios completos
+
+### Pendiente 📋
 - [ ] Paginación en listados
-- [ ] Actualización y eliminación
-- [ ] MapStruct para mapeos
-- [ ] Spring Security
-- [ ] Actuator y métricas
+- [ ] Endpoints de actualización y eliminación
+- [ ] MapStruct para mapeos DTO-Domain
+- [ ] Spring Security (JWT)
+- [ ] Spring Actuator y métricas
+- [ ] Prometheus + Grafana
 - [ ] CI/CD con GitHub Actions
+- [ ] Jacoco con threshold mínimo
+- [ ] Rate limiting con Redis
+- [ ] Correlation ID para trazabilidad
 
 ## 📖 Documentación Adicional
 
@@ -407,9 +735,10 @@ docker-compose ps
 2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
 3. Aplicar formato (`./gradlew spotlessApply`)
 4. Ejecutar tests (`./gradlew test`)
-5. Commit cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-6. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-7. Crear Pull Request
+5. Validar calidad (`./gradlew check`)
+6. Commit cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+7. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+8. Crear Pull Request
 
 ## 📝 Licencia
 
@@ -417,4 +746,32 @@ Este proyecto es un template base para desarrollo de APIs REST con Spring Boot.
 
 ---
 
+## 🏆 Características Destacadas
+
+### 🔒 Seguridad
+- Sanitización automática de datos sensibles en logs
+- Usuario no-root en Docker
+- Validación de inputs con Bean Validation
+
+### 🚀 Performance
+- Cache distribuido con Redis
+- Imagen Docker optimizada (~200MB)
+- Configuración JVM optimizada
+
+### 🛠️ Calidad
+- 4 herramientas de análisis de código
+- >80% cobertura de tests
+- Tests de integración con Testcontainers
+
+### 📊 Observabilidad
+- Logging completo de requests/responses
+- Medición de duración de operaciones
+- Logs estructurados y seguros
+
+---
+
 ⭐ **¿Te fue útil?** Dale una estrella al repositorio
+
+🐛 **¿Encontraste un bug?** Reporta un issue
+
+💡 **¿Tienes una idea?** Contribuye con un PR
