@@ -513,100 +513,31 @@ Ver documentación completa: [REDIS.md](REDIS.md)
 
 ## ✨ Calidad de Código
 
-El proyecto integra **4 herramientas de calidad** que se ejecutan automáticamente:
+El proyecto integra **4 herramientas de calidad** que se ejecutan automáticamente en cada build:
 
-### 1. Spotless - Formato Automático
+| Herramienta | Propósito | Se ejecuta en |
+|-------------|-----------|---------------|
+| **Spotless** | Formato automático del código | `build`, `compileJava` |
+| **Checkstyle** | Validación de convenciones | `check` |
+| **PMD** | Detección de code smells | `check` |
+| **SpotBugs** | Análisis estático de bugs | `check` |
 
-Formatea el código automáticamente antes de cada compilación:
-
-```bash
-# Aplicar formato manualmente
-./gradlew spotlessApply
-
-# Verificar formato
-./gradlew spotlessCheck
-```
-
-**Configuración:**
-- Google Java Format (AOSP)
-- Indentación: 4 espacios
-- Imports ordenados y sin duplicados
-- Se ejecuta automáticamente antes de `compileJava`
-
-### 2. Checkstyle - Convenciones de Código
-
-Valida naming conventions y estructura del código:
-
-```bash
-# Ejecutar Checkstyle
-./gradlew checkstyleMain checkstyleTest
-
-# Ver reporte HTML
-start build/reports/checkstyle/main.html
-```
-
-**Valida:**
-- ✅ Nombres en PascalCase para clases
-- ✅ Nombres en camelCase para métodos y variables
-- ✅ Constantes en UPPER_SNAKE_CASE
-- ✅ Imports sin wildcards (*)
-- ✅ No usar System.out/err (usar logger)
-- ✅ Javadoc en clases y métodos públicos
-- ✅ Complejidad ciclomática < 15
-- ✅ Máximo 7 parámetros por método
-
-### 3. PMD - Detección de Code Smells
-
-Detecta problemas de diseño y malas prácticas:
-
-```bash
-# Ejecutar PMD
-./gradlew pmdMain pmdTest
-
-# Ver reporte HTML
-start build/reports/pmd/main.html
-```
-
-**Detecta:**
-- 🔍 Código duplicado
-- 🔍 Variables no utilizadas
-- 🔍 Métodos demasiado largos o complejos
-- 🔍 Importaciones innecesarias
-- 🔍 Expresiones demasiado complejas
-
-### 4. SpotBugs - Análisis Estático de Bugs
-
-Encuentra bugs potenciales mediante análisis del bytecode:
-
-```bash
-# Ejecutar SpotBugs
-./gradlew spotbugsMain spotbugsTest
-
-# Ver reporte HTML
-start build/reports/spotbugs/main.html
-```
-
-**Detecta:**
-- 🐛 NullPointerException potenciales
-- 🐛 Resource leaks
-- 🐛 Thread safety issues
-- 🐛 Performance issues
-- 🐛 Security vulnerabilities
-
-### Ejecutar Todas las Herramientas
+### Comandos Rápidos
 
 ```bash
 # Build completo con todas las validaciones
 ./gradlew clean build
 
-# Solo herramientas de calidad
-./gradlew spotlessCheck checkstyleMain pmdMain spotbugsMain
+# Solo herramientas de calidad (sin tests)
+./gradlew spotlessApply checkstyleMain pmdMain spotbugsMain
 
-# Todas las herramientas + tests
-./gradlew check
+# Ver reportes
+start build/reports/checkstyle/main.html
+start build/reports/pmd/main.html
+start build/reports/spotbugs/main.html
 ```
 
-**Nota:** El build falla si SpotBugs encuentra bugs de alta severidad.
+📖 **[Ver documentación completa de Calidad de Código →](docs/CODE_QUALITY.md)**
 
 ## 🧪 Testing
 
@@ -713,6 +644,8 @@ spring:
 start build/reports/jacoco/test/html/index.html
 ```
 
+📖 **[Ver documentación completa de Testing →](docs/TESTING.md)**
+
 ## 📚 Documentación API (Swagger)
 
 La API está documentada con **OpenAPI 3.0**:
@@ -760,30 +693,38 @@ Todas las respuestas de error siguen el mismo formato:
 - InfrastructureException     // 500
 ```
 
-## 📦 Base de Datos
+## 📦 Base de Datos y Migraciones
 
-### Migraciones con Flyway
+### Flyway - Migraciones Versionadas
 
-Las migraciones se versionan en `src/main/resources/db/migration/`:
+El proyecto usa **Flyway** para gestionar las migraciones de base de datos de forma automática y versionada.
 
-```sql
--- V1__create_schema.sql
-CREATE SCHEMA IF NOT EXISTS app;
+**Migraciones actuales:**
+- `V1` - Crear schema `app`
+- `V2` - Crear tabla `examples`
+- `V3` - Insertar datos semilla
+- `V4` - Crear tabla `call_history`
 
--- V2__create_example_table.sql
-CREATE TABLE app.examples (
-    id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(120) NOT NULL,
-    dni VARCHAR(20) NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+```bash
+# Ejecutar migraciones manualmente
+./gradlew flywayMigrate
 
--- V3__insert_example_seed_data.sql
-INSERT INTO app.examples (name, dni)
-VALUES ('John Doe', '12345678');
+# Ver información de estado
+./gradlew flywayInfo
+
+# Ver historial en la BD
+docker exec -it baseapi2-postgres psql -U postgres -d baseapi2 -c "SELECT * FROM app.flyway_schema_history;"
 ```
 
-### Comandos Útiles
+**Características:**
+- ✅ Ejecución automática al iniciar la aplicación
+- ✅ Versionamiento incremental (V1, V2, V3...)
+- ✅ Histórico completo en tabla `flyway_schema_history`
+- ✅ Mismo esquema en producción y tests
+
+📖 **[Ver documentación completa de Flyway →](docs/FLYWAY.md)**
+
+### Comandos PostgreSQL
 
 ```bash
 # Conectar a PostgreSQL
@@ -794,9 +735,6 @@ docker exec -it baseapi2-postgres psql -U postgres -d baseapi2
 
 # Ver datos
 SELECT * FROM app.examples;
-
-# Ver historial de Flyway
-SELECT * FROM app.flyway_schema_history;
 ```
 
 ## 🛠️ Comandos Útiles
@@ -804,10 +742,10 @@ SELECT * FROM app.flyway_schema_history;
 ### Docker Compose
 
 ```bash
-# Ver logs de todos los servicios
-docker-compose logs -f
+# Levantar servicios
+docker-compose up --build -d
 
-# Ver logs de la app
+# Ver logs
 docker-compose logs -f app
 
 # Reiniciar servicios
@@ -816,18 +754,11 @@ docker-compose restart
 # Detener todo
 docker-compose down
 
-# Detener y eliminar volúmenes
-docker-compose down -v
-
-# Reconstruir sin caché
-docker-compose build --no-cache
-
-# Ver estado de servicios
+# Ver estado
 docker-compose ps
-
-# Ver uso de recursos
-docker stats baseapi2-app baseapi2-postgres baseapi2-redis
 ```
+
+📖 **[Ver guía completa de Despliegue con Docker Compose →](docs/DEPLOYMENT.md)**
 
 ### Gradle
 
@@ -910,8 +841,18 @@ docker stats baseapi2-app baseapi2-postgres baseapi2-redis
 
 ## 📖 Documentación Adicional
 
-- [DOCKER.md](DOCKER.md) - Guía completa de Docker
-- [REDIS.md](REDIS.md) - Guía de Redis y caché
+### Guías Detalladas
+
+- 📚 **[Calidad de Código](docs/CODE_QUALITY.md)** - Spotless, Checkstyle, PMD, SpotBugs
+- 🧪 **[Testing](docs/TESTING.md)** - Tests unitarios, integración, Testcontainers
+- 📦 **[Flyway](docs/FLYWAY.md)** - Migraciones de base de datos
+- 🚀 **[Deployment](docs/DEPLOYMENT.md)** - Docker Compose, despliegue y troubleshooting
+
+### Otros Documentos
+
+- 🐳 **[DOCKER.md](DOCKER.md)** - Guía completa de Docker
+- 🔴 **[REDIS.md](REDIS.md)** - Guía de Redis y caché
+- 📋 **[RULES_PROJECT.MD](docs/RULES_PROJECT.MD)** - Reglas del proyecto
 
 ## 🤝 Contribuir
 
@@ -951,11 +892,3 @@ Este proyecto es un template base para desarrollo de APIs REST con Spring Boot.
 - Logging completo de requests/responses
 - Medición de duración de operaciones
 - Logs estructurados y seguros
-
----
-
-⭐ **¿Te fue útil?** Dale una estrella al repositorio
-
-🐛 **¿Encontraste un bug?** Reporta un issue
-
-💡 **¿Tienes una idea?** Contribuye con un PR
