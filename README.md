@@ -6,7 +6,7 @@
 <p align="center">
   <a href="#"><img src="https://img.shields.io/badge/Spring_Boot-3.2.2-brightgreen" alt="Spring Boot"></a>
   <a href="#"><img src="https://img.shields.io/badge/chat-on%20Discord-7289da.svg?sanitize=true" alt="Chat"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Java-17-orange" alt="Java"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Java-21-orange" alt="Java"></a>
   <a href="docs/postman/Base API 2 - REST API.postman_collection.json" download><img src="https://img.shields.io/badge/Postman-Collection-orange?logo=postman&logoColor=white" alt="Postman Collection"></a>
 </p>
 
@@ -17,13 +17,13 @@
 
 # 🚀 Base API 2
 
-API REST base con Spring Boot 4.0.2 (Java 17), arquitectura hexagonal, Redis cache, logging avanzado y herramientas de calidad de código.
+API REST base con Spring Boot 4.0.2 (Java 21), arquitectura hexagonal, Redis cache, logging avanzado y herramientas de calidad de código.
 
 ## ✨ Características
 
 ### Arquitectura y Desarrollo
 - ✅ **Arquitectura Hexagonal** (Ports & Adapters)
-- ✅ **Spring Boot 4.0.2** con Java 17
+- ✅ **Spring Boot 4.0.2** con Java 21
 - ✅ **Lombok** para reducir boilerplate
 
 ### Base de Datos y Persistencia
@@ -86,7 +86,7 @@ src/main/java/com/ar/laboratory/baseapi2/
 ## 🚀 Tecnologías
 
 ### Backend
-- **Java 17**
+- **Java 21**
 - **Spring Boot 4.0.2**
   - Spring Data JPA
   - Spring Data Redis
@@ -121,7 +121,7 @@ src/main/java/com/ar/laboratory/baseapi2/
 
 ## 📋 Requisitos
 
-- Java 17+
+- Java 21+
 - Docker y Docker Compose
 - Gradle 8.14+
 
@@ -159,8 +159,8 @@ docker-compose up postgres redis -d
 
 El proyecto incluye un **Dockerfile multi-stage optimizado**:
 
-- **Fase 1**: Compilación con Gradle 8.14 + JDK 17 Alpine
-- **Fase 2**: Runtime con JRE 17 Alpine
+- **Fase 1**: Compilación con Gradle 8.14 + JDK 21 Alpine
+- **Fase 2**: Runtime con JRE 21 Alpine
 
 **Características:**
 - 🏷️ Etiquetas informativas durante el build
