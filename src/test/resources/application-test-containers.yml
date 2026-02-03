@@ -1,0 +1,42 @@
+# Configuración para Tests con Testcontainers
+# Este perfil se usa cuando se ejecutan tests de integración con Testcontainers
+# Las propiedades de conexión a PostgreSQL se configuran automáticamente mediante @ServiceConnection
+
+spring:
+  # Configuración de JPA para tests con Testcontainers
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Validate because Flyway creates the schema
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Configuración de Flyway para tests
+  flyway:
+    enabled: true
+    schemas: app
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: false  # Permitir clean en tests
+
+  # Configuración de Redis para tests (usando mock o embedded)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # Configuración de Cache para tests
+  cache:
+    type: simple
+
+# Configuración de logging para tests
+logging:
+  level:
+    root: INFO
+    com.ar.laboratory.baseapi2: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.testcontainers: INFO
+    com.github.dockerjava: WARN
+    org.testcontainers.utility.ResourceReaper: WARN
