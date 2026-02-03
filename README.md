@@ -1,3 +1,22 @@
+<p align="center">
+<a href="https://www.linkedin.com/in/soriamaximilianorodrigo/" target="_blank" rel="noopener noreferrer">
+<img width="100%" height="100%" src="docs/img/banner.gif" alt="Linkedin"></a></p>
+
+
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/Spring_Boot-3.2.2-brightgreen" alt="Spring Boot"></a>
+  <a href="#"><img src="https://img.shields.io/badge/chat-on%20Discord-7289da.svg?sanitize=true" alt="Chat"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Java-21-orange" alt="Chat"></a>
+</p>
+
+<br>
+<br>
+<p align="center">
+
+
+
+## 🚀 Introduction
+
 # 🚀 Base API 2
 
 API REST base con Spring Boot 4.0.2 (Java 17), arquitectura hexagonal, Redis cache, logging avanzado y herramientas de calidad de código.
