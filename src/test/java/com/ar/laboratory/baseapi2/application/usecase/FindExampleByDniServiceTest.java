@@ -3,10 +3,10 @@ package com.ar.laboratory.baseapi2.application.usecase;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.ar.laboratory.baseapi2.application.dto.ExampleResponse;
-import com.ar.laboratory.baseapi2.application.port.out.ExampleRepositoryPort;
-import com.ar.laboratory.baseapi2.domain.exception.ExampleNotFoundException;
-import com.ar.laboratory.baseapi2.domain.model.Example;
+import com.ar.laboratory.baseapi2.example.application.outbound.port.ExampleRepositoryPort;
+import com.ar.laboratory.baseapi2.example.application.usecase.FindExampleByDniUseCase;
+import com.ar.laboratory.baseapi2.example.domain.exception.ExampleNotFoundException;
+import com.ar.laboratory.baseapi2.example.domain.model.Example;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ class FindExampleByDniServiceTest {
 
     @Mock private ExampleRepositoryPort exampleRepositoryPort;
 
-    @InjectMocks private FindExampleByDniService findExampleByDniService;
+    @InjectMocks private FindExampleByDniUseCase findExampleByDniUseCase;
 
     private Example example;
     private String testDni;
@@ -39,7 +39,7 @@ class FindExampleByDniServiceTest {
         when(exampleRepositoryPort.findByDni(testDni)).thenReturn(Optional.of(example));
 
         // Act
-        ExampleResponse result = findExampleByDniService.findByDni(testDni);
+        Example result = findExampleByDniUseCase.execute(testDni);
 
         // Assert
         assertNotNull(result);
@@ -60,7 +60,7 @@ class FindExampleByDniServiceTest {
         // Act & Assert
         assertThrows(
                 ExampleNotFoundException.class,
-                () -> findExampleByDniService.findByDni(nonExistentDni));
+                () -> findExampleByDniUseCase.execute(nonExistentDni));
 
         verify(exampleRepositoryPort, times(1)).findByDni(nonExistentDni);
     }
@@ -75,7 +75,7 @@ class FindExampleByDniServiceTest {
         when(exampleRepositoryPort.findByDni("87654321")).thenReturn(Optional.of(completeExample));
 
         // Act
-        ExampleResponse result = findExampleByDniService.findByDni("87654321");
+        Example result = findExampleByDniUseCase.execute("87654321");
 
         // Assert
         assertEquals(10L, result.getId());

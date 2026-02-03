@@ -1,7 +1,6 @@
 package com.ar.laboratory.baseapi2.callhistory.infrastructure.inbound.web.api;
 
 import com.ar.laboratory.baseapi2.callhistory.infrastructure.inbound.web.dto.CallHistoryResponse;
-import com.ar.laboratory.baseapi2.shared.infrastructure.web.api.StandardApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +39,6 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> listAll(
             @Parameter(description = "Cantidad de registros a retornar", example = "50")
                     @RequestParam(defaultValue = "50")
@@ -66,7 +64,6 @@ public interface CallHistoryApi {
                                                                 CallHistoryResponse.class))),
                 @ApiResponse(responseCode = "404", description = "Registro no encontrado")
             })
-    @StandardApiResponses
     ResponseEntity<CallHistoryResponse> findById(
             @Parameter(description = "ID del registro", example = "1") @PathVariable Long id);
 
@@ -86,7 +83,6 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> findByDateRange(
             @Parameter(description = "Fecha desde (ISO format)", example = "2026-02-03T00:00:00")
                     @RequestParam
@@ -113,7 +109,6 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> findByCorrelationId(
             @Parameter(
                             description = "Correlation ID para rastrear llamadas relacionadas",
@@ -137,7 +132,6 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> findByPath(
             @Parameter(description = "Path del endpoint", example = "/api/v1/examples")
                     @RequestParam
@@ -161,7 +155,6 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> findBySuccess(
             @Parameter(
                             description =
@@ -186,6 +179,5 @@ public interface CallHistoryApi {
                                                         implementation =
                                                                 CallHistoryResponse.class)))
             })
-    @StandardApiResponses
     ResponseEntity<List<CallHistoryResponse>> findFailures();
 }

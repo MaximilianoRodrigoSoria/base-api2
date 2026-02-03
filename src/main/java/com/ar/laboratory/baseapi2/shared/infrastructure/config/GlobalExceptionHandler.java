@@ -1,9 +1,9 @@
 package com.ar.laboratory.baseapi2.infrastructure.config;
 
-import com.ar.laboratory.baseapi2.domain.exception.BadRequestException;
-import com.ar.laboratory.baseapi2.domain.exception.ExampleAlreadyExistsException;
-import com.ar.laboratory.baseapi2.domain.exception.ExampleNotFoundException;
-import com.ar.laboratory.baseapi2.domain.exception.InfrastructureException;
+import com.ar.laboratory.baseapi2.example.domain.exception.ExampleAlreadyExistsException;
+import com.ar.laboratory.baseapi2.example.domain.exception.ExampleNotFoundException;
+import com.ar.laboratory.baseapi2.shared.infrastructure.exception.BadRequestException;
+import com.ar.laboratory.baseapi2.shared.infrastructure.exception.InfrastructureException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;

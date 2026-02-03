@@ -53,12 +53,12 @@ public interface ExampleApi {
 
     @Operation(summary = "Crear un nuevo ejemplo", ...)
     @ApiResponses(...)
-    @StandardApiResponses
+
     ResponseEntity<ExampleResponse> create(@Valid @RequestBody CreateExampleRequest request);
 
     @Operation(summary = "Listar todos los ejemplos", ...)
     @ApiResponses(...)
-    @StandardApiResponses
+
     ResponseEntity<List<ExampleResponse>> listAll();
 
     // ... más métodos
