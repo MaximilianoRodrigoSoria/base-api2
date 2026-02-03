@@ -64,23 +64,190 @@ El proyecto sigue **Arquitectura Hexagonal (Ports & Adapters)**:
 
 ```
 src/main/java/com/ar/laboratory/baseapi2/
-├── application/              # Capa de aplicación
-│   ├── dto/                 # DTOs (Request/Response)
-│   ├── port/
-│   │   ├── in/             # Puertos de entrada (Use Cases)
-│   │   └── out/            # Puertos de salida (Repositorios)
-│   └── usecase/            # Implementación de casos de uso
-├── domain/                  # Capa de dominio
-│   ├── model/              # Modelos de dominio
-│   └── exception/          # Excepciones de negocio
-└── infrastructure/          # Capa de infraestructura
-    ├── adapter/
-    │   ├── in/web/         # Controllers REST
-    │   └── out/persistence/ # Implementación JPA
-    ├── config/             # Configuración (Cache, Swagger, etc)
-    └── logging/            # Sistema de logging y sanitización
-        ├── LoggingFilter   # Filtro HTTP para captura de requests
-        └── LogSanitizer    # Sanitización de datos sensibles
+│
+├── 📦 example/                              # Módulo de dominio: Example
+│   ├── application/                         # ⚙️ Capa de Aplicación
+│   │   ├── inbound/                        # Puertos de entrada
+│   │   │   └── command/                    # Comandos (DTOs de entrada)
+│   │   │       ├── CreateExampleCommand.java
+│   │   │       ├── FindExampleByDniCommand.java
+│   │   │       └── ListExamplesCommand.java
+│   │   ├── outbound/                       # Puertos de salida
+│   │   │   └── port/
+│   │   │       └── ExampleRepositoryPort.java  # Interface del repositorio
+│   │   └── usecase/                        # Casos de uso (lógica de aplicación)
+│   │       ├── CreateExampleUseCase.java
+│   │       ├── FindExampleByDniUseCase.java
+│   │       └── ListExamplesUseCase.java
+│   │
+│   ├── domain/                              # 🎯 Capa de Dominio
+│   │   ├── model/
+│   │   │   └── Example.java               # Entidad de dominio
+│   │   └── exception/                      # Excepciones de negocio
+│   │       ├── ExampleAlreadyExistsException.java
+│   │       └── ExampleNotFoundException.java
+│   │
+│   └── infrastructure/                      # 🔌 Capa de Infraestructura
+│       ├── config/
+│       │   └── ExampleConfig.java          # Configuración de beans
+│       ├── inbound/                        # Adaptadores de entrada
+│       │   └── web/
+│       │       ├── api/
+│       │       │   └── ExampleApi.java     # OpenAPI interface
+│       │       ├── controller/
+│       │       │   └── ExampleController.java  # REST Controller
+│       │       ├── dto/                    # DTOs de entrada/salida
+│       │       │   ├── CreateExampleRequest.java
+│       │       │   └── ExampleResponse.java
+│       │       └── mapper/
+│       │           └── ExampleDtoMapper.java   # Mapeo DTO ↔ Domain
+│       └── outbound/                       # Adaptadores de salida
+│           └── persistence/
+│               ├── adapter/
+│               │   └── ExamplePersistenceAdapter.java  # Impl del puerto
+│               ├── entity/
+│               │   └── ExampleEntity.java  # Entidad JPA
+│               ├── mapper/
+│               │   └── ExampleEntityMapper.java  # Mapeo Domain ↔ Entity
+│               └── repository/
+│                   └── ExampleJpaRepository.java  # Spring Data JPA
+│
+├── 📦 callhistory/                          # Módulo de dominio: Call History
+│   ├── application/                         # ⚙️ Capa de Aplicación
+│   │   ├── inbound/
+│   │   │   └── command/                    # 6 comandos de consulta
+│   │   │       ├── FindByCorrelationIdCommand.java
+│   │   │       ├── FindByDateRangeCommand.java
+│   │   │       ├── FindByIdCommand.java
+│   │   │       ├── FindByPathCommand.java
+│   │   │       ├── FindBySuccessCommand.java
+│   │   │       └── ListCallHistoryCommand.java
+│   │   ├── outbound/
+│   │   │   └── port/
+│   │   │       └── CallHistoryRepositoryPort.java
+│   │   └── usecase/                        # 6 casos de uso
+│   │       ├── FindByCorrelationIdUseCase.java
+│   │       ├── FindByDateRangeUseCase.java
+│   │       ├── FindByIdUseCase.java
+│   │       ├── FindByPathUseCase.java
+│   │       ├── FindBySuccessUseCase.java
+│   │       └── ListCallHistoryUseCase.java
+│   │
+│   ├── domain/                              # 🎯 Capa de Dominio
+│   │   ├── model/
+│   │   │   └── CallHistoryRecord.java
+│   │   └── exception/
+│   │       └── CallHistoryNotFoundException.java
+│   │
+│   └── infrastructure/                      # 🔌 Capa de Infraestructura
+│       ├── config/
+│       │   └── CallHistoryConfig.java
+│       ├── inbound/
+│       │   └── web/
+│       │       ├── api/
+│       │       │   └── CallHistoryApi.java
+│       │       ├── controller/
+│       │       │   └── CallHistoryController.java
+│       │       ├── dto/
+│       │       │   └── CallHistoryResponse.java
+│       │       └── mapper/
+│       │           └── CallHistoryDtoMapper.java
+│       └── outbound/
+│           └── persistence/
+│               ├── adapter/
+│               │   └── CallHistoryPersistenceAdapter.java
+│               ├── entity/
+│               │   └── CallHistoryEntity.java
+│               ├── mapper/
+│               │   └── CallHistoryEntityMapper.java
+│               └── repository/
+│                   └── CallHistoryJpaRepository.java
+│
+└── 📦 shared/                               # 🔧 Componentes Compartidos
+    └── infrastructure/
+        ├── annotation/
+        │   └── CallHistory.java            # Anotación para auditoría
+        ├── cache/
+        │   └── CacheLoggingAspect.java     # Aspecto para logging de caché
+        ├── config/
+        │   ├── AsyncConfig.java            # Configuración de async
+        │   ├── CacheConfig.java            # Configuración de Redis
+        │   ├── ErrorResponse.java          # DTO de respuesta de error
+        │   ├── GlobalExceptionHandler.java # Manejo global de excepciones
+        │   └── OpenApiConfig.java          # Configuración de Swagger
+        ├── exception/
+        │   ├── BadRequestException.java
+        │   └── InfrastructureException.java
+        ├── history/
+        │   ├── CallHistoryAspect.java      # Aspecto para auditoría de llamadas
+        │   └── CallHistoryAsyncWriter.java # Escritura asíncrona de historial
+        ├── logging/
+        │   ├── LoggingFilter.java          # Filtro HTTP de logging
+        │   └── LogSanitizer.java           # Sanitización de datos sensibles
+        └── web/
+            └── api/
+                └── StandardApiResponses.java  # Respuestas API estándar
+```
+
+### 📐 Principios de la Arquitectura Hexagonal
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    🌐 ADAPTADORES DE ENTRADA                 │
+│              (Controllers, REST API, Web Layer)              │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    ⚙️ CAPA DE APLICACIÓN                     │
+│          (Use Cases, Commands, Application Services)        │
+│                                                              │
+│  ┌────────────────┐              ┌─────────────────┐        │
+│  │ Puertos de     │              │ Puertos de      │        │
+│  │ Entrada (IN)   │              │ Salida (OUT)    │        │
+│  │ • Commands     │              │ • Repository    │        │
+│  │ • Use Cases    │              │   Interfaces    │        │
+│  └────────────────┘              └─────────────────┘        │
+└────────────────────────┬────────────────┬───────────────────┘
+                         │                │
+                         ▼                │
+┌─────────────────────────────────────────┘
+│                    🎯 CAPA DE DOMINIO
+│            (Entities, Value Objects, Domain Logic)
+│                  (Sin dependencias externas)
+└─────────────────────────────────────────┐
+                                          │
+                                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   🔌 ADAPTADORES DE SALIDA                   │
+│         (JPA, PostgreSQL, Redis, External APIs)              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🔄 Flujo de una Petición HTTP
+
+```
+1. HTTP Request
+   ↓
+2. Controller (Adaptador de Entrada)
+   ↓
+3. Mapper: DTO → Command
+   ↓
+4. Use Case (Lógica de Aplicación)
+   ↓
+5. Domain Model (Lógica de Negocio)
+   ↓
+6. Repository Port (Interface)
+   ↓
+7. Persistence Adapter (Adaptador de Salida)
+   ↓
+8. JPA Repository → PostgreSQL
+   ↓
+9. Entity → Domain Model
+   ↓
+10. Domain Model → DTO
+    ↓
+11. HTTP Response
 ```
 
 ## 🚀 Tecnologías
