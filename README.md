@@ -15,9 +15,6 @@
 <p align="center">
 
 
-
-## 🚀 Introduction
-
 # 🚀 Base API 2
 
 API REST base con Spring Boot 4.0.2 (Java 17), arquitectura hexagonal, Redis cache, logging avanzado y herramientas de calidad de código.
