@@ -85,3 +85,7 @@ spotless {
         endWithNewline()
     }
 }
+
+// Ejecutar spotlessApply automáticamente antes de compilar
+tasks.compileJava.dependsOn tasks.spotlessApply
+tasks.compileTestJava.dependsOn tasks.spotlessApply
