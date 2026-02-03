@@ -5,6 +5,7 @@ import com.ar.laboratory.baseapi2.application.port.in.FindExampleByDniUseCase;
 import com.ar.laboratory.baseapi2.application.port.out.ExampleRepositoryPort;
 import com.ar.laboratory.baseapi2.domain.exception.ExampleNotFoundException;
 import com.ar.laboratory.baseapi2.domain.model.Example;
+import com.ar.laboratory.baseapi2.infrastructure.config.CacheConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,7 +21,7 @@ public class FindExampleByDniService implements FindExampleByDniUseCase {
     private final ExampleRepositoryPort exampleRepositoryPort;
 
     @Override
-    @Cacheable(value = "examplesByDni", key = "#dni")
+    @Cacheable(value = CacheConfig.EXAMPLES_BY_DNI, key = "#dni")
     @Transactional(readOnly = true)
     public ExampleResponse findByDni(String dni) {
         log.info("Buscando Example por DNI: {}", dni);

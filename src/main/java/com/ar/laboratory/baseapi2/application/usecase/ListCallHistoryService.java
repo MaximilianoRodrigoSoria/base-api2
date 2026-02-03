@@ -5,11 +5,13 @@ import com.ar.laboratory.baseapi2.application.port.in.ListCallHistoryUseCase;
 import com.ar.laboratory.baseapi2.application.port.out.CallHistoryRepositoryPort;
 import com.ar.laboratory.baseapi2.domain.exception.ExampleNotFoundException;
 import com.ar.laboratory.baseapi2.domain.model.CallHistoryRecord;
+import com.ar.laboratory.baseapi2.infrastructure.config.CacheConfig;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /** Servicio para listar y consultar el historial de llamadas */
@@ -21,6 +23,7 @@ public class ListCallHistoryService implements ListCallHistoryUseCase {
     private final CallHistoryRepositoryPort callHistoryRepository;
 
     @Override
+    @Cacheable(value = CacheConfig.CALL_HISTORY_CACHE, key = "'listAll:' + #limit + ':' + #offset")
     public List<CallHistoryResponse> listAll(int limit, int offset) {
         log.debug("Listing call history: limit={}, offset={}", limit, offset);
         List<CallHistoryRecord> records = callHistoryRepository.findAll(limit, offset);

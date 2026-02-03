@@ -39,7 +39,7 @@ spring:
   cache:
     type: redis
     redis:
-      time-to-live: 600000
+      time-to-live: 600000 # TTL por defecto: 10 minutos
 
 # Configuración del servidor
 server:
@@ -64,3 +64,10 @@ logging:
   level:
     root: INFO
     com.ar.laboratory.baseapi2: INFO
+
+# Configuración de aplicación
+app:
+  # Habilitar/deshabilitar caché con Redis
+  # Valores: true (habilita caché) / false (deshabilita caché)
+  cache:
+    enabled: true

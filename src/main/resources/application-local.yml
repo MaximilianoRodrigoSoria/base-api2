@@ -14,3 +14,8 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Configuración de aplicación para desarrollo local
+app:
+  cache:
+    enabled: true # Activar caché en desarrollo local

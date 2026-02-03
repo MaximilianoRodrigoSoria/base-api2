@@ -4,10 +4,12 @@ import com.ar.laboratory.baseapi2.application.dto.ExampleResponse;
 import com.ar.laboratory.baseapi2.application.port.in.ListExamplesUseCase;
 import com.ar.laboratory.baseapi2.application.port.out.ExampleRepositoryPort;
 import com.ar.laboratory.baseapi2.domain.model.Example;
+import com.ar.laboratory.baseapi2.infrastructure.config.CacheConfig;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class ListExamplesService implements ListExamplesUseCase {
     private final ExampleRepositoryPort exampleRepositoryPort;
 
     @Override
+    @Cacheable(value = CacheConfig.EXAMPLES_CACHE, key = "'all'")
     @Transactional(readOnly = true)
     public List<ExampleResponse> listAll() {
         log.info("Listando todos los Examples");
