@@ -275,7 +275,7 @@ RESPONSE: {"id":1,"name":"John Doe","dni":"****"}
 
 ```java
 // LoggingFilter.java
-private static final Set<String> SKIP_PATH_PREFIXES = 
+private static final Set<String> SKIP_PATH_PREFIXES =
     Set.of("/actuator", "/swagger-ui", "/v3/api-docs");
 ```
 
@@ -450,7 +450,7 @@ start build/reports/spotbugs/main.html
 class FindExampleByDniServiceTest {
     @Mock private ExampleRepositoryPort repository;
     @InjectMocks private FindExampleByDniService service;
-    
+
     @Test
     void shouldFindExampleByDni() {
         // Arrange, Act, Assert
@@ -464,9 +464,9 @@ class FindExampleByDniServiceTest {
 @SpringBootTest
 class ExampleRepositoryIntegrationTest {
     @Container
-    static PostgreSQLContainer<?> postgres = 
+    static PostgreSQLContainer<?> postgres =
         new PostgreSQLContainer<>("postgres:15-alpine");
-    
+
     @Test
     void shouldPersistExample() {
         // Test con PostgreSQL real en Docker
@@ -480,7 +480,7 @@ class ExampleRepositoryIntegrationTest {
 class ExampleControllerIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
-    
+
     @Test
     void shouldCreateExample() {
         webTestClient.post().uri("/api/v1/examples")
