@@ -8,6 +8,7 @@ import com.ar.laboratory.baseapi2.domain.exception.ExampleAlreadyExistsException
 import com.ar.laboratory.baseapi2.domain.model.Example;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class CreateExampleService implements CreateExampleUseCase {
 
     @Override
     @Transactional
+    @CacheEvict(value = "examplesByDni", key = "#request.dni")
     public ExampleResponse create(CreateExampleRequest request) {
         log.info("Creando Example con DNI: {}", request.getDni());
 

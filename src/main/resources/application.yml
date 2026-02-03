@@ -27,6 +27,19 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+  
+  # Configuración de Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+  
+  # Configuración de Cache
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
 
 # Configuración del servidor
 server:

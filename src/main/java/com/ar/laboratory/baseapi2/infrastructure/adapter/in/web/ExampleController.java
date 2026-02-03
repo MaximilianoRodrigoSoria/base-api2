@@ -3,6 +3,7 @@ package com.ar.laboratory.baseapi2.infrastructure.adapter.in.web;
 import com.ar.laboratory.baseapi2.application.dto.CreateExampleRequest;
 import com.ar.laboratory.baseapi2.application.dto.ExampleResponse;
 import com.ar.laboratory.baseapi2.application.port.in.CreateExampleUseCase;
+import com.ar.laboratory.baseapi2.application.port.in.FindExampleByDniUseCase;
 import com.ar.laboratory.baseapi2.application.port.in.ListExamplesUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +29,7 @@ public class ExampleController {
 
     private final CreateExampleUseCase createExampleUseCase;
     private final ListExamplesUseCase listExamplesUseCase;
+    private final FindExampleByDniUseCase findExampleByDniUseCase;
 
     /** Crear un nuevo Example */
     @Operation(
@@ -77,6 +79,33 @@ public class ExampleController {
         log.info("Request GET /examples");
 
         List<ExampleResponse> response = listExamplesUseCase.listAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /** Buscar Example por DNI */
+    @Operation(
+            summary = "Buscar ejemplo por DNI",
+            description =
+                    "Busca un ejemplo específico por su DNI. Los resultados se cachean en Redis"
+                            + " para mejorar el rendimiento")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Ejemplo encontrado exitosamente",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = ExampleResponse.class))),
+                @ApiResponse(responseCode = "404", description = "Ejemplo no encontrado"),
+                @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+            })
+    @GetMapping("/dni/{dni}")
+    public ResponseEntity<ExampleResponse> findByDni(@PathVariable String dni) {
+        log.info("Request GET /examples/dni/{}", dni);
+
+        ExampleResponse response = findExampleByDniUseCase.findByDni(dni);
 
         return ResponseEntity.ok(response);
     }
