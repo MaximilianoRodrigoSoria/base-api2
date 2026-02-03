@@ -5,6 +5,7 @@ import com.ar.laboratory.baseapi2.application.dto.ExampleResponse;
 import com.ar.laboratory.baseapi2.application.port.in.CreateExampleUseCase;
 import com.ar.laboratory.baseapi2.application.port.in.FindExampleByDniUseCase;
 import com.ar.laboratory.baseapi2.application.port.in.ListExamplesUseCase;
+import com.ar.laboratory.baseapi2.infrastructure.annotation.CallHistory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +33,11 @@ public class ExampleController {
     private final FindExampleByDniUseCase findExampleByDniUseCase;
 
     /** Crear un nuevo Example */
+    @CallHistory(
+            action = "CREATE_EXAMPLE",
+            logRequest = true,
+            logResponse = true,
+            maskFields = {"password", "token"})
     @Operation(
             summary = "Crear un nuevo ejemplo",
             description = "Crea un nuevo ejemplo con nombre y DNI únicos")

@@ -37,6 +37,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 
+    // AOP for Call History
+    implementation 'org.springframework:spring-aop'
+    implementation 'org.aspectj:aspectjweaver'
+
     // Flyway - versión explícita para PostgreSQL 15
     implementation 'org.flywaydb:flyway-core:10.20.1'
     implementation 'org.flywaydb:flyway-database-postgresql:10.20.1'
