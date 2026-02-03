@@ -30,15 +30,17 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
   
-  # Configuración de Redis para tests (usando mock o embedded)
+  # Deshabilitar Redis completamente en tests
   data:
     redis:
-      host: localhost
-      port: 6379
+      enabled: false
   
-  # Configuración de Cache para tests
-  cache:
-    type: simple
+  # Deshabilitar autoconfiguraciones de Redis
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration
 
 # Configuración de logging para tests
 logging:
