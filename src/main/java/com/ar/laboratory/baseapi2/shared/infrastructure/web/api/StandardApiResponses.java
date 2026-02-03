@@ -1,5 +1,6 @@
 package com.ar.laboratory.baseapi2.shared.infrastructure.web.api;
 
+import com.ar.laboratory.baseapi2.infrastructure.config.ErrorResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

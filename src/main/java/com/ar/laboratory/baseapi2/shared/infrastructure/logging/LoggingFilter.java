@@ -1,5 +1,6 @@
 package com.ar.laboratory.baseapi2.shared.infrastructure.logging;
 
+import com.ar.laboratory.baseapi2.infrastructure.logging.LogSanitizer;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

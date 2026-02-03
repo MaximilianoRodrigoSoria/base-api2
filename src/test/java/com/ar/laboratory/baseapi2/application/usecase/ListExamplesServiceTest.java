@@ -3,9 +3,9 @@ package com.ar.laboratory.baseapi2.application.usecase;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-import com.ar.laboratory.baseapi2.application.dto.ExampleResponse;
-import com.ar.laboratory.baseapi2.application.port.out.ExampleRepositoryPort;
-import com.ar.laboratory.baseapi2.domain.model.Example;
+import com.ar.laboratory.baseapi2.example.application.outbound.port.ExampleRepositoryPort;
+import com.ar.laboratory.baseapi2.example.application.usecase.ListExamplesUseCase;
+import com.ar.laboratory.baseapi2.example.domain.model.Example;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -16,12 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ListExamplesService Tests")
+@DisplayName("ListExamplesUseCase Tests")
 class ListExamplesServiceTest {
 
     @Mock private ExampleRepositoryPort exampleRepositoryPort;
 
-    @InjectMocks private ListExamplesService listExamplesService;
+    @InjectMocks private ListExamplesUseCase listExamplesUseCase;
 
     @Test
     @DisplayName("Debe listar todos los Examples exitosamente")
@@ -35,7 +35,7 @@ class ListExamplesServiceTest {
         when(exampleRepositoryPort.findAll()).thenReturn(examples);
 
         // When
-        List<ExampleResponse> responses = listExamplesService.listAll();
+        List<Example> responses = listExamplesUseCase.execute();
 
         // Then
         assertThat(responses).isNotNull();
@@ -53,7 +53,7 @@ class ListExamplesServiceTest {
         when(exampleRepositoryPort.findAll()).thenReturn(Arrays.asList());
 
         // When
-        List<ExampleResponse> responses = listExamplesService.listAll();
+        List<Example> responses = listExamplesUseCase.execute();
 
         // Then
         assertThat(responses).isNotNull();
