@@ -6,7 +6,8 @@
 <p align="center">
   <a href="#"><img src="https://img.shields.io/badge/Spring_Boot-3.2.2-brightgreen" alt="Spring Boot"></a>
   <a href="#"><img src="https://img.shields.io/badge/chat-on%20Discord-7289da.svg?sanitize=true" alt="Chat"></a>
-  <a href="#"><img src="https://img.shields.io/badge/Java-21-orange" alt="Chat"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Java-17-orange" alt="Java"></a>
+  <a href="docs/postman/Base API 2 - REST API.postman_collection.json" download><img src="https://img.shields.io/badge/Postman-Collection-orange?logo=postman&logoColor=white" alt="Postman Collection"></a>
 </p>
 
 <br>
